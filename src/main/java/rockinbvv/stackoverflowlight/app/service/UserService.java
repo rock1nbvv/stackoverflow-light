@@ -1,6 +1,6 @@
 package rockinbvv.stackoverflowlight.app.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import rockinbvv.stackoverflowlight.app.model.User;
 import rockinbvv.stackoverflowlight.app.repository.UserRepository;
@@ -8,10 +8,10 @@ import rockinbvv.stackoverflowlight.app.repository.UserRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
