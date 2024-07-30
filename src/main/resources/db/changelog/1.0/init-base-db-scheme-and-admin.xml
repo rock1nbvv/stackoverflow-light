@@ -35,7 +35,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="id_author" type="bigint">
-                <constraints nullable="false"/>
+<!--                <constraints nullable="false"/>-->
             </column>
         </createTable>
     </changeSet>

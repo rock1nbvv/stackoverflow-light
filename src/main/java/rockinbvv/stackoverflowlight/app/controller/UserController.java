@@ -1,6 +1,7 @@
 package rockinbvv.stackoverflowlight.app.controller;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.MediaType;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import rockinbvv.stackoverflowlight.app.dto.user.UserCreateDto;
 import rockinbvv.stackoverflowlight.app.model.User;
 import rockinbvv.stackoverflowlight.app.service.UserService;
 import rockinbvv.stackoverflowlight.system.crypto.EncryptionService;
@@ -20,6 +22,7 @@ import rockinbvv.stackoverflowlight.system.crypto.EncryptionService;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
+@Tag(name = "User")
 public class UserController {
 
     private final UserService userService;
@@ -33,18 +36,21 @@ public class UserController {
 
     @GetMapping("/full/{id}")
     @Description("Get user and validate its password")
-    public ResponseEntity<User> getUserById(@PathVariable Long id, @RequestParam String password) {
+    public ResponseEntity<User> getFullUserById(@PathVariable Long id, @RequestParam String password) {
         User user = userService.getUserById(id);
-        if(!encryptionService.decrypt(password, user.getPassword())){
-            return ResponseEntity.badRequest().build();
+        if (user != null) {
+            if (!encryptionService.decrypt(password, user.getPassword())) {
+                return ResponseEntity.badRequest().build();
+            }
+            user.setPassword(password);
+            return ResponseEntity.ok(user);
         }
-        user.setPassword(password);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public User createUser(@RequestBody User user) {
-        return userService.saveUser(user);
+    public User createUser(@RequestBody UserCreateDto userCreateDto) {
+        return userService.saveUser(userCreateDto);
     }
 
     @DeleteMapping("/{id}")

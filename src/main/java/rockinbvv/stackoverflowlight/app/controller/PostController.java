@@ -1,6 +1,7 @@
 package rockinbvv.stackoverflowlight.app.controller;
 
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import rockinbvv.stackoverflowlight.app.dto.post.PostCreateDto;
 import rockinbvv.stackoverflowlight.app.model.Post;
 import rockinbvv.stackoverflowlight.app.service.PostService;
 
 @RestController
 @RequestMapping("/api/post")
 @RequiredArgsConstructor
+@Tag(name = "Post")
 public class PostController {
 
     private final PostService postService;
@@ -28,8 +31,8 @@ public class PostController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Post createPost(@RequestBody Post post) {
-        return postService.savePost(post);
+    public Post createPost(@RequestBody PostCreateDto postCreateDto) {
+        return postService.savePost(postCreateDto);
     }
 
     @DeleteMapping("/{id}")

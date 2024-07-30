@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import rockinbvv.stackoverflowlight.app.dto.user.UserCreateDto;
 import rockinbvv.stackoverflowlight.app.model.User;
 import rockinbvv.stackoverflowlight.app.repository.PostRepository;
 import rockinbvv.stackoverflowlight.app.repository.UserRepository;
@@ -19,8 +20,14 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public User saveUser(UserCreateDto createUserDto) {
+        return userRepository.save(
+                User.builder()
+                        .name(createUserDto.getName())
+                        .email(createUserDto.getEmail())
+                        .password(createUserDto.getPassword())
+                        .build()
+        );
     }
 
     @Transactional
