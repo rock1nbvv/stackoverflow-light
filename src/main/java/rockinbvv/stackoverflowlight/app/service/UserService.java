@@ -1,21 +1,19 @@
 package rockinbvv.stackoverflowlight.app.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import rockinbvv.stackoverflowlight.app.model.User;
+import rockinbvv.stackoverflowlight.app.repository.PostRepository;
 import rockinbvv.stackoverflowlight.app.repository.UserRepository;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
 
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
@@ -25,7 +23,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        postRepository.nullifyUserInPosts(user);
+        userRepository.delete(user);
     }
 }
