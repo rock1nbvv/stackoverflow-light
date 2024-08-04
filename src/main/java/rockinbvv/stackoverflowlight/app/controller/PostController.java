@@ -30,6 +30,13 @@ public class PostController {
         return post != null ? ResponseEntity.ok(post) : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/{id}/answerTree")
+    public ResponseEntity<PostService.PostAnswerTree> getPostAnswerTree(@PathVariable Long id) {
+        PostService.PostAnswerTree postAnswerTree = postService.getPostAnswerTree(id);
+
+        return postAnswerTree != null ? ResponseEntity.ok(postAnswerTree) : ResponseEntity.notFound().build();
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public Post createPost(@RequestBody PostCreateDto postCreateDto) {
         return postService.savePost(postCreateDto);

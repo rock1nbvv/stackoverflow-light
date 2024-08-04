@@ -34,8 +34,26 @@
             <column name="body" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="id_author" type="bigint">
-<!--                <constraints nullable="false"/>-->
+            <column name="author" type="bigint">
+                <constraints nullable="true" foreignKeyName="fk_author" references="app_user(id)"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="answer">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="body" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author" type="bigint">
+                <constraints nullable="true" foreignKeyName="fk_author" references="app_user(id)"/>
+            </column>
+            <column name="post" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_post" references="post(id)"/>
+            </column>
+            <column name="parent" type="bigint">
+                <constraints nullable="true" foreignKeyName="fk_parent" references="answer(id)"/>
             </column>
         </createTable>
     </changeSet>

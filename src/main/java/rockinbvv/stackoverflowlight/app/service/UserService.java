@@ -17,7 +17,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id)
+                .orElse(null);
     }
 
     public User saveUser(UserCreateDto createUserDto) {
@@ -31,11 +32,11 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
+    public void disableUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        postRepository.nullifyUserInPosts(user);
+        postRepository.nullifyUserInPosts(user); //todo dont nullify but deactivate user
         userRepository.delete(user);
     }
 }
