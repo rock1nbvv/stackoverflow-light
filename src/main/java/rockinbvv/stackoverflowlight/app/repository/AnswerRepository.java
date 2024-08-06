@@ -9,6 +9,6 @@ import java.util.List;
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
 
-    List<Answer> findAnswersByPost(Post post);
+    List<Answer> findAnswersByPost(Post post);//todo change to postId
 
 }

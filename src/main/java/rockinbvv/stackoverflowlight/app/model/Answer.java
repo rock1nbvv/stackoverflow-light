@@ -39,4 +39,6 @@ public class Answer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent")
     private Answer parent;
+
+    //parent path 11.2.7.5
 }

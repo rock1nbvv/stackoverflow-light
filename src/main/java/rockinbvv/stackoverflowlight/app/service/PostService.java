@@ -1,6 +1,5 @@
 package rockinbvv.stackoverflowlight.app.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import rockinbvv.stackoverflowlight.app.dto.answer.AnswerResponseDto;
 import rockinbvv.stackoverflowlight.app.dto.post.PostCreateDto;
-import rockinbvv.stackoverflowlight.app.dto.post.PostResponseDto;
 import rockinbvv.stackoverflowlight.app.model.Answer;
 import rockinbvv.stackoverflowlight.app.model.Post;
 import rockinbvv.stackoverflowlight.app.model.User;
@@ -52,7 +50,7 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    @Transactional
+    @Transactional()
     public PostAnswerTree getPostAnswerTree(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
@@ -71,23 +69,19 @@ public class PostService {
                 .collect(Collectors.groupingBy(AnswerResponseDto::getAuthorId));
 
         PostAnswerTree postAnswerTree = PostAnswerTree.builder()
-                .post(PostResponseDto.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .body(post.getBody())
-                        .idAuthor(post.getAuthor().getId())
-                        .build())
+                .id(post.getId())
+                .title(post.getTitle())
+                .body(post.getBody())
+                .idAuthor(post.getAuthor().getId())
                 .postAnswers(
                         postAnswers.stream()
                                 .filter(answer -> answer.getParent() == null)
                                 .map(answer ->
                                         PostAnswer.builder()
-                                                .answer(AnswerResponseDto.builder()
-                                                        .id(answer.getId())
-                                                        .body(answer.getBody())
-                                                        .postId(answer.getPost().getId())
-                                                        .authorId(answer.getAuthor().getId())
-                                                        .build())
+                                                .id(answer.getId())
+                                                .body(answer.getBody())
+                                                .postId(answer.getPost().getId())
+                                                .authorId(answer.getAuthor().getId())
                                                 .childAnswers(childAnswerMap.get(answer.getId()))
                                                 .build()
                                 )
@@ -100,7 +94,10 @@ public class PostService {
     @Builder
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class PostAnswerTree {
-        private PostResponseDto post;
+        private Long id;
+        private String title;
+        private String body;
+        private Long idAuthor;
         private List<PostAnswer> postAnswers;
     }
 
@@ -108,7 +105,11 @@ public class PostService {
     @Builder
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class PostAnswer {
-        private AnswerResponseDto answer;
+        private Long id;
+        private String body;
+        private Long authorId;
+        private Long postId;
+        private Long parentId;
         private List<AnswerResponseDto> childAnswers;
     }
 }
