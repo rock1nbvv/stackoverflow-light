@@ -66,7 +66,7 @@ public class PostService {
                         .parentId(answer.getParent().getId())
                         .postId(answer.getPost().getId())
                         .build())
-                .collect(Collectors.groupingBy(AnswerResponseDto::getAuthorId));
+                .collect(Collectors.groupingBy(AnswerResponseDto::getParentId));
 
         PostAnswerTree postAnswerTree = PostAnswerTree.builder()
                 .id(post.getId())
