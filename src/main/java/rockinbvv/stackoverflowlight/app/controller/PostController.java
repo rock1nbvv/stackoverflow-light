@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import rockinbvv.stackoverflowlight.app.dto.post.PostCreateDto;
+import rockinbvv.stackoverflowlight.app.model.Answer;
 import rockinbvv.stackoverflowlight.app.model.Post;
 import rockinbvv.stackoverflowlight.app.service.PostService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/post")
@@ -30,11 +33,11 @@ public class PostController {
         return post != null ? ResponseEntity.ok(post) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{id}/answerTree")
-    public ResponseEntity<PostService.PostAnswerTree> getPostAnswerTree(@PathVariable Long id) {
-        PostService.PostAnswerTree postAnswerTree = postService.getPostAnswerTree(id);
+    @GetMapping("/{id}/postAnswers")
+    public ResponseEntity<List<Answer>> getPostAnswers(@PathVariable Long id) {
+        List<Answer> postAnswers = postService.getPostAnswers(id);
 
-        return postAnswerTree != null ? ResponseEntity.ok(postAnswerTree) : ResponseEntity.notFound().build();
+        return postAnswers != null ? ResponseEntity.ok(postAnswers) : ResponseEntity.notFound().build();
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
