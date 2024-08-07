@@ -55,7 +55,7 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
-        List<Answer> postAnswers = answerRepository.findAnswersByPost(post);
+        List<Answer> postAnswers = answerRepository.findByPostId(id);
 
         Map<Long, List<AnswerResponseDto>> childAnswerMap = postAnswers.stream()
                 .filter(answer -> answer.getParent() != null)
