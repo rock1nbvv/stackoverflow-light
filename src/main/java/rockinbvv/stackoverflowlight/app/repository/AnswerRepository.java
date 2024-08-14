@@ -1,7 +1,7 @@
 package rockinbvv.stackoverflowlight.app.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import rockinbvv.stackoverflowlight.app.data.dto.answer.FullAnswerResponseDto;
+import rockinbvv.stackoverflowlight.app.data.dto.answer.response.FullAnswerResponseDto;
 import rockinbvv.stackoverflowlight.app.data.model.Answer;
 import rockinbvv.stackoverflowlight.app.data.model.Post;
 

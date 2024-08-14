@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.app.data.dto.answer;
+package rockinbvv.stackoverflowlight.app.data.dto.post.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
@@ -8,16 +8,10 @@ import lombok.Data;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AnswerResponseDto {
-
+public class PostResponseDto {
     private Long id;
-
-    @NotNull
+    private String title;
     private String body;
-
-    private Long authorId;
-
-    private Long postId;
-
-    private Long parentId;
+    @NotNull
+    private Long idAuthor;
 }

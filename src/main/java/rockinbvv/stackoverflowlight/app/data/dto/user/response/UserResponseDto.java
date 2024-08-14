@@ -1,14 +1,14 @@
-package rockinbvv.stackoverflowlight.app.data.dto.user;
+package rockinbvv.stackoverflowlight.app.data.dto.user.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-//@Builder
-//@Jacksonized
+@Builder
 public class UserResponseDto {
+    private Long id;
     private String name;
-    private String password;
     private String email;
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import rockinbvv.stackoverflowlight.app.data.dto.post.PostCreateDto;
+import rockinbvv.stackoverflowlight.app.data.dto.post.request.PostCreateDto;
 import rockinbvv.stackoverflowlight.app.data.model.Answer;
 import rockinbvv.stackoverflowlight.app.data.model.Post;
 import rockinbvv.stackoverflowlight.app.service.PostService;

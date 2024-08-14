@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.app.data.dto.post;
+package rockinbvv.stackoverflowlight.app.data.dto.post.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

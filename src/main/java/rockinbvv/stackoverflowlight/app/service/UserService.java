@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import rockinbvv.stackoverflowlight.app.data.dto.user.UserCreateDto;
+import rockinbvv.stackoverflowlight.app.data.dto.user.request.UserCreateDto;
 import rockinbvv.stackoverflowlight.app.data.model.User;
 import rockinbvv.stackoverflowlight.app.repository.PostRepository;
 import rockinbvv.stackoverflowlight.app.repository.UserRepository;
