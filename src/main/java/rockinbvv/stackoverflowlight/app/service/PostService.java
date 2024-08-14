@@ -4,15 +4,18 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import rockinbvv.stackoverflowlight.app.dto.post.PostCreateDto;
-import rockinbvv.stackoverflowlight.app.model.Answer;
-import rockinbvv.stackoverflowlight.app.model.Post;
-import rockinbvv.stackoverflowlight.app.model.User;
+import rockinbvv.stackoverflowlight.app.data.dto.answer.AnswerResponseDto;
+import rockinbvv.stackoverflowlight.app.data.dto.post.PostCreateDto;
+import rockinbvv.stackoverflowlight.app.data.model.Answer;
+import rockinbvv.stackoverflowlight.app.data.model.Post;
+import rockinbvv.stackoverflowlight.app.data.model.User;
 import rockinbvv.stackoverflowlight.app.repository.AnswerRepository;
 import rockinbvv.stackoverflowlight.app.repository.PostRepository;
 import rockinbvv.stackoverflowlight.app.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +51,18 @@ public class PostService {
     public List<Answer> getPostAnswers(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        Stream<AnswerResponseDto> answerResponseDtoStream = answerRepository.findAnswersByPost(post).stream().map(answer -> AnswerResponseDto.builder()
+                .id(answer.getId())
+                .body(answer.getBody())
+                .postId(answer.getPost().getId())
+                .authorId(Optional.ofNullable(answer.getAuthor())
+                        .map(User::getId)
+                        .orElse(null))
+                .parentId(Optional.ofNullable(answer.getParent())
+                        .map(Answer::getId)
+                        .orElse(null))
+                .build());
 
         List<Answer> answers = answerRepository.findAnswersByPost(post);
         return answers;

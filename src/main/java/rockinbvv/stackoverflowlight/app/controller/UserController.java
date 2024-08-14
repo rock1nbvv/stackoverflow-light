@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import rockinbvv.stackoverflowlight.app.dto.user.UserCreateDto;
-import rockinbvv.stackoverflowlight.app.model.User;
+import rockinbvv.stackoverflowlight.app.data.dto.user.UserCreateDto;
+import rockinbvv.stackoverflowlight.app.data.model.User;
 import rockinbvv.stackoverflowlight.app.service.UserService;
 import rockinbvv.stackoverflowlight.system.crypto.EncryptionService;
 

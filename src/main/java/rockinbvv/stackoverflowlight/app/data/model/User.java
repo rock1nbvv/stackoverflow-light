@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.app.model;
+package rockinbvv.stackoverflowlight.app.data.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

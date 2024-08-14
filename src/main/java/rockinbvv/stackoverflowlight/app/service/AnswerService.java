@@ -4,13 +4,16 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import rockinbvv.stackoverflowlight.app.dto.answer.AnswerCreateDto;
-import rockinbvv.stackoverflowlight.app.model.Answer;
-import rockinbvv.stackoverflowlight.app.model.Post;
-import rockinbvv.stackoverflowlight.app.model.User;
+import rockinbvv.stackoverflowlight.app.data.dto.answer.AnswerCreateDto;
+import rockinbvv.stackoverflowlight.app.data.dto.answer.FullAnswerResponseDto;
+import rockinbvv.stackoverflowlight.app.data.model.Answer;
+import rockinbvv.stackoverflowlight.app.data.model.Post;
+import rockinbvv.stackoverflowlight.app.data.model.User;
 import rockinbvv.stackoverflowlight.app.repository.AnswerRepository;
 import rockinbvv.stackoverflowlight.app.repository.PostRepository;
 import rockinbvv.stackoverflowlight.app.repository.UserRepository;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +22,18 @@ public class AnswerService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
 
-    public Answer getAnswerById(Long id) {
-        return answerRepository.findById(id)
-                .orElse(null);
+    @Transactional
+    public Answer getVladById() {
+        Optional<Answer> test = answerRepository.someCustomMethod(Answer.builder().build());
+
+        return vlad.orElse(null);
+    }
+
+    @Transactional
+    public FullAnswerResponseDto getAnswerById(Long id) {
+        FullAnswerResponseDto answer = answerRepository.findAnswerById(id).orElse(null);
+
+        return answer;
     }
 
     @Transactional

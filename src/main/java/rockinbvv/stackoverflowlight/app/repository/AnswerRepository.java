@@ -1,21 +1,16 @@
 package rockinbvv.stackoverflowlight.app.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import rockinbvv.stackoverflowlight.app.model.Answer;
-import rockinbvv.stackoverflowlight.app.model.Post;
+import rockinbvv.stackoverflowlight.app.data.dto.answer.FullAnswerResponseDto;
+import rockinbvv.stackoverflowlight.app.data.model.Answer;
+import rockinbvv.stackoverflowlight.app.data.model.Post;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface AnswerRepository extends JpaRepository<Answer, Long> {
+public interface AnswerRepository extends JpaRepository<Answer, Long>, AnswerRepositoryCustom {
 
+    Optional<FullAnswerResponseDto> findAnswerById(Long id);
 
-    List<Answer> findAnswersByPost(Post post);//todo change to postId
-
-    @Query("SELECT a " +
-            "FROM Answer a " +
-            "JOIN FETCH a.author " +
-            "WHERE a.post.id = :postId")
-    List<Answer> findByPostId(@Param("postId") Long postId);
+    List<Answer> findAnswersByPost(Post post); // todo change to postId
 }
