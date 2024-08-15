@@ -26,7 +26,7 @@ public class AnswerService {
     public Answer getVladById() {
         Optional<Answer> test = answerRepository.someCustomMethod(Answer.builder().build());
 
-        return vlad.orElse(null);
+        return test.orElse(null);
     }
 
     @Transactional
