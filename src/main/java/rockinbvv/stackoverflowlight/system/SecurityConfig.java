@@ -31,17 +31,23 @@ public class SecurityConfig {
         http
                 .requestCache(RequestCacheConfigurer::disable)
                 .csrf(csrf ->
-                        csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())//todo get along changes processing of csrf so swagger works
+                        csrf
+                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
 
                 )
-                .authorizeHttpRequests(
-                        authorizeHttp -> {
-                            authorizeHttp.anyRequest().authenticated();
-                        }
+                .authorizeHttpRequests(authorizeHttp ->
+                        authorizeHttp
+                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                                .anyRequest().authenticated()
+
                 )
                 .oauth2Login(oauth2LoginConfig ->
-                        oauth2LoginConfig.userInfoEndpoint(withDefaults())
+                        oauth2LoginConfig
+                                .authorizationEndpoint(withDefaults())
+                                .redirectionEndpoint(withDefaults())
+                                .tokenEndpoint(withDefaults())
+                                .userInfoEndpoint(withDefaults())
                                 .successHandler(successHandler())
                 )
                 .logout(l -> l.logoutSuccessUrl("/"));
@@ -51,7 +57,6 @@ public class SecurityConfig {
 
     @Bean
     AuthenticationSuccessHandler successHandler() {
-
         SimpleUrlAuthenticationSuccessHandler handler = new SimpleUrlAuthenticationSuccessHandler();
         handler.setDefaultTargetUrl("/swagger-ui/index.html");
         return handler;

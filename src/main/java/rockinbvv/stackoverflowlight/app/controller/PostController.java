@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable Long id, Authentication auth) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+        OAuth2AuthenticationToken authorities = (OAuth2AuthenticationToken) authentication.getAuthorities();
         if (authentication != null) {
             System.out.println(authentication.getName());
         }
