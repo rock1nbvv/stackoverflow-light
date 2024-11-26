@@ -42,8 +42,8 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
 
                 )
-                .oauth2Login(oauth2LoginConfig ->
-                        oauth2LoginConfig
+                .oauth2Login(oauth2Login ->
+                        oauth2Login
                                 .authorizationEndpoint(withDefaults())
                                 .redirectionEndpoint(withDefaults())
                                 .tokenEndpoint(withDefaults())
