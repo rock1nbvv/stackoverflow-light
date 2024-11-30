@@ -2,6 +2,7 @@ package rockinbvv.stackoverflowlight.system;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,7 +24,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomOidcUserService customOidcUserService;
 
 
     @Bean
@@ -47,7 +51,9 @@ public class SecurityConfig {
                                 .authorizationEndpoint(withDefaults())
                                 .redirectionEndpoint(withDefaults())
                                 .tokenEndpoint(withDefaults())
-                                .userInfoEndpoint(withDefaults())
+                                .userInfoEndpoint(
+                                        userInfoEndpointConfig -> userInfoEndpointConfig.oidcUserService(customOidcUserService)
+                                )
                                 .successHandler(successHandler())
                 )
                 .logout(l -> l.logoutSuccessUrl("/"));
