@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.system;
+package rockinbvv.stackoverflowlight.system.db;
 
 import liquibase.change.custom.CustomTaskChange;
 import liquibase.database.Database;

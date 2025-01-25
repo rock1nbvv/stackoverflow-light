@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.system;
+package rockinbvv.stackoverflowlight.system.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
@@ -21,9 +21,7 @@ public class CustomOidcUserService extends OidcUserService {
 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-
         OidcUser oidcUser = super.loadUser(userRequest);
-
         try {
             return processOidcUser(userRequest, oidcUser);
         } catch (AuthenticationException ex) {
@@ -69,5 +67,4 @@ public class CustomOidcUserService extends OidcUserService {
         existingUser.setName(oAuth2UserInfo.getAttribute("name"));
         userRepository.save(existingUser);
     }
-
 }

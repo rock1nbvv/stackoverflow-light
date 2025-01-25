@@ -21,7 +21,7 @@
             </column>
         </createTable>
 
-        <customChange class="rockinbvv.stackoverflowlight.system.CreateAdminChange"/>
+        <customChange class="rockinbvv.stackoverflowlight.system.db.CreateAdminChange"/>
 
         <createTable tableName="post">
             <column name="id" type="bigint" autoIncrement="true">

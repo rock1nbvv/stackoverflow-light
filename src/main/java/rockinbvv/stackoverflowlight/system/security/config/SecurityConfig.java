@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.system;
+package rockinbvv.stackoverflowlight.system.security.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +17,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.util.StringUtils;
+import rockinbvv.stackoverflowlight.system.security.CustomOidcUserService;
 
 import java.util.function.Supplier;
 
