@@ -1,7 +1,7 @@
 # stackoverflow-light
 
-http://localhost:8080/swagger-ui/index.html
-http://localhost:8080/login
+http://localhost:8080/stackoverflow-light/swagger-ui/index.html
+http://localhost:8080/stackoverflow-light/login
 
 ## Security
 
