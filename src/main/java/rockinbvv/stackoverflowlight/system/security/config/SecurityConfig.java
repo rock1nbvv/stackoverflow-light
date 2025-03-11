@@ -8,24 +8,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
+import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 import org.springframework.util.StringUtils;
 import rockinbvv.stackoverflowlight.system.security.CustomOidcUserService;
 
 import java.util.function.Supplier;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableSpringHttpSession
 public class SecurityConfig {
 
     private final CustomOidcUserService customOidcUserService;
@@ -49,14 +52,13 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2Login ->
                         oauth2Login
-                                .authorizationEndpoint(withDefaults())
-                                .redirectionEndpoint(withDefaults())
-                                .tokenEndpoint(withDefaults())
-                                .userInfoEndpoint(
-                                        userInfoEndpointConfig -> userInfoEndpointConfig.oidcUserService(customOidcUserService)
-                                )
+                                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.oidcUserService(customOidcUserService))
                                 .successHandler(successHandler())
                 )
+                .sessionManagement(session -> session.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession))
+                .securityContext(securityContext -> securityContext.securityContextRepository(new DelegatingSecurityContextRepository(
+                        new HttpSessionSecurityContextRepository()
+                )))
                 .logout(l -> l.logoutSuccessUrl("/"));
 
         return http.build();

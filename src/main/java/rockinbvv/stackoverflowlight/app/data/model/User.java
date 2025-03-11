@@ -28,6 +28,8 @@ public class User {
 
     private String password;
 
+    private String googleId;
+
     @NotNull
     private String email;
 }

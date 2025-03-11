@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByEmail(@NotNull String email);
 
     Optional<User> findOneByEmailEqualsIgnoreCase(@NotNull String email);
+
+    Optional<User> findOneByGoogleId(@NotNull String googleId);
 }
