@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.system.security.config;
+package rockinbvv.stackoverflowlight.system.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +21,6 @@ import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 import org.springframework.util.StringUtils;
-import rockinbvv.stackoverflowlight.system.security.CustomOidcUserService;
 
 import java.util.function.Supplier;
 
@@ -52,13 +51,18 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2Login ->
                         oauth2Login
-                                .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.oidcUserService(customOidcUserService))
+                                .userInfoEndpoint(userInfoEndpointConfig ->
+                                        userInfoEndpointConfig.oidcUserService(customOidcUserService)
+                                )
                                 .successHandler(successHandler())
                 )
-                .sessionManagement(session -> session.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession))
-                .securityContext(securityContext -> securityContext.securityContextRepository(new DelegatingSecurityContextRepository(
-                        new HttpSessionSecurityContextRepository()
-                )))
+                .sessionManagement(session ->
+                        session.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession)
+                )
+                .securityContext(securityContext ->
+                        securityContext.securityContextRepository(new DelegatingSecurityContextRepository(
+                                new HttpSessionSecurityContextRepository()
+                        )))
                 .logout(l -> l.logoutSuccessUrl("/"));
 
         return http.build();

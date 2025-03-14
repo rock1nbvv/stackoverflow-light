@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import rockinbvv.stackoverflowlight.app.data.dto.post.request.PostCreateDto;
 import rockinbvv.stackoverflowlight.app.data.model.Answer;
 import rockinbvv.stackoverflowlight.app.data.model.Post;
 import rockinbvv.stackoverflowlight.app.service.PostService;
+import rockinbvv.stackoverflowlight.system.security.CustomOidcUser;
 
 import java.util.List;
 
@@ -53,13 +55,15 @@ public class PostController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyAuthority('OIDC_USER')")
     public Post createPost(@RequestBody PostCreateDto postCreateDto, Authentication auth) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        DefaultOidcUser oidcUser = (DefaultOidcUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (authentication != null) {
-            System.out.println(String.format("User %s has created a post", authentication.getName()));
+        if (oidcUser instanceof CustomOidcUser) {
+            Long userId = ((CustomOidcUser) oidcUser).getUserId();
+            return postService.savePost(postCreateDto, userId);
         }
 
-        return postService.savePost(postCreateDto);
+        throw new IllegalStateException("User is not authenticated");
+
     }
 
     @DeleteMapping("/{id}")

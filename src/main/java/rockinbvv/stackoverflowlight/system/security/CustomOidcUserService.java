@@ -1,39 +1,55 @@
 package rockinbvv.stackoverflowlight.system.security;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import rockinbvv.stackoverflowlight.app.data.model.User;
 import rockinbvv.stackoverflowlight.app.repository.UserRepository;
 
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
-@RequiredArgsConstructor
 public class CustomOidcUserService extends OidcUserService {
+
     private final UserRepository userRepository;
 
+    public CustomOidcUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Override
-    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
+    public OidcUser loadUser(OidcUserRequest userRequest) {
         OidcUser oidcUser = super.loadUser(userRequest);
 
-        String googleId = oidcUser.getSubject();
-        String email = oidcUser.getEmail();
-        String name = oidcUser.getFullName();
+        String email = oidcUser.getAttribute("email");
+        String googleId = oidcUser.getAttribute("sub"); // Google User ID
 
-        userRepository.findOneByGoogleId(googleId).orElseGet(() -> {
-            User newUser = new User();
-            newUser.setGoogleId(googleId);
-            newUser.setEmail(email);
-            newUser.setName(name);
-            return userRepository.save(newUser);
-        });
+        // Fetch the user from the database using email or googleId
+        Optional<User> optionalUser = userRepository.findOneByEmail(email);
+        User user;
 
-        return new DefaultOidcUser(oidcUser.getAuthorities(), oidcUser.getIdToken(), oidcUser.getUserInfo(), "sub");
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+        } else {
+            // Register the user if not found
+            user = User.builder()
+                .email(email)
+                .googleId(googleId)
+                .name(oidcUser.getAttribute("name"))
+                .build();
+            user = userRepository.save(user);
+        }
+
+        // Create CustomOidcUser with userId included
+        return new CustomOidcUser(
+            user.getId(),
+            Set.copyOf(oidcUser.getAuthorities()),
+            oidcUser.getIdToken(),
+            user.getEmail()
+        );
     }
 }
 
