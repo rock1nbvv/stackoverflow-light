@@ -4,9 +4,12 @@ http://localhost:8080/stackoverflow-light/swagger-ui/index.html
 http://localhost:8080/stackoverflow-light/login
 
 ## Environment
+
 * java 17, pgsql
 
 ## Security
+
+https://console.cloud.google.com/apis/credentials
 
 * OIDC
     * OpenId

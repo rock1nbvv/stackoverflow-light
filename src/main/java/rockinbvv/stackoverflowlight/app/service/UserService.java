@@ -1,42 +1,66 @@
 package rockinbvv.stackoverflowlight.app.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
-import rockinbvv.stackoverflowlight.app.data.dto.user.request.UserCreateDto;
-import rockinbvv.stackoverflowlight.app.data.model.User;
-import rockinbvv.stackoverflowlight.app.repository.PostRepository;
-import rockinbvv.stackoverflowlight.app.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
+import rockinbvv.stackoverflowlight.app.exception.EmailAlreadyExistsException;
+import rockinbvv.stackoverflowlight.app.exception.InvalidPasswordException;
+import rockinbvv.stackoverflowlight.app.exception.UserNotFoundException;
+import rockinbvv.stackoverflowlight.app.dao.UserDao;
+import rockinbvv.stackoverflowlight.app.data.User;
+import rockinbvv.stackoverflowlight.app.data.dto.user.request.CreateUserDto;
+import rockinbvv.stackoverflowlight.system.crypto.EncryptionService;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final UserDao userDao;
+    private final EncryptionService encryptionService;
 
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElse(null);
+    @Transactional(readOnly = true)
+    public User getUserById(long id) {
+        return userDao.findOneById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public User saveUser(UserCreateDto createUserDto) {
-        return userRepository.save(
-                User.builder()
-                        .name(createUserDto.getName())
-                        .email(createUserDto.getEmail())
-                        .password(createUserDto.getPassword())
-                        .build()
-        );
+    @Transactional(readOnly = true)
+    public User getAndValidateUserPassword(Long id, String rawPassword) {
+        User user = userDao.findOneById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!encryptionService.decrypt(rawPassword, user.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+
+        user.setPassword(rawPassword);
+        return user;
     }
 
     @Transactional
-    public void disableUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public Long createUser(CreateUserDto userDto) {
+        Optional<User> existing = userDao.findOneByEmail(userDto.getEmail());
+        if (existing.isPresent()) {
+            throw new EmailAlreadyExistsException(userDto.getEmail());
+        }
 
-        postRepository.nullifyUserInPosts(user); //todo dont nullify but deactivate user
-        userRepository.delete(user);
+        try {
+            return userDao.registerUser(userDto);
+        } catch (DuplicateKeyException e) {
+            throw new EmailAlreadyExistsException(userDto.getEmail());
+        }
+    }
+
+    @Transactional
+    public void deactivateUserById(long userId) {
+        boolean exists = userDao.findOneById(userId).isPresent();
+        if (!exists) {
+            throw new UserNotFoundException(userId);
+        }
+
+        userDao.corruptById(userId);
     }
 }
