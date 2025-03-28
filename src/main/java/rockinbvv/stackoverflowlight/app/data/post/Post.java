@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.app.data;
+package rockinbvv.stackoverflowlight.app.data.post;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,14 +10,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Post {
+
     private Long id;
 
     @NotNull
-    private String name;
-    private String password;
-    private String googleId;
+    private String title;
 
     @NotNull
-    private String email;
+    private String body;
+
+    private long authorId;
 }

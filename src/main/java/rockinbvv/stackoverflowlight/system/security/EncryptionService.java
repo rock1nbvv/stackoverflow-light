@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.system.crypto;
+package rockinbvv.stackoverflowlight.system.security;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;

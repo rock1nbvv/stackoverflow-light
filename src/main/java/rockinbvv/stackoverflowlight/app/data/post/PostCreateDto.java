@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.app.data.dto.post.request;
+package rockinbvv.stackoverflowlight.app.data.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

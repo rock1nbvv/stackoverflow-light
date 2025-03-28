@@ -1,24 +1,25 @@
-package rockinbvv.stackoverflowlight.app.data;
+package rockinbvv.stackoverflowlight.app.data.answer;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import rockinbvv.stackoverflowlight.app.data.post.Post;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post {
+public class Answer {
 
     private Long id;
 
     @NotNull
-    private String title;
+    private String body;
+    private long authorId;
 
     @NotNull
-    private String body;
-
-    private long authorId;
+    private Post post;
+    private Answer parent;
 }

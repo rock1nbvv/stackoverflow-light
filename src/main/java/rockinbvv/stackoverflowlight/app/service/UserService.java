@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rockinbvv.stackoverflowlight.app.dao.UserDao;
+import rockinbvv.stackoverflowlight.app.data.user.UserCreateDto;
+import rockinbvv.stackoverflowlight.app.data.user.UserFullResponseDto;
+import rockinbvv.stackoverflowlight.app.data.user.UserResponseDto;
 import rockinbvv.stackoverflowlight.app.exception.EmailAlreadyExistsException;
 import rockinbvv.stackoverflowlight.app.exception.InvalidPasswordException;
 import rockinbvv.stackoverflowlight.app.exception.UserNotFoundException;
-import rockinbvv.stackoverflowlight.app.dao.UserDao;
-import rockinbvv.stackoverflowlight.app.data.User;
-import rockinbvv.stackoverflowlight.app.data.dto.user.request.CreateUserDto;
-import rockinbvv.stackoverflowlight.system.crypto.EncryptionService;
+import rockinbvv.stackoverflowlight.system.security.EncryptionService;
 
 import java.util.Optional;
 
@@ -22,33 +23,35 @@ public class UserService {
     private final EncryptionService encryptionService;
 
     @Transactional(readOnly = true)
-    public User getUserById(long id) {
-        return userDao.findOneById(id)
+    public UserResponseDto getUserById(long id) {
+        return userDao.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Transactional(readOnly = true)
-    public User getAndValidateUserPassword(Long id, String rawPassword) {
-        User user = userDao.findOneById(id)
+    public UserFullResponseDto getAndValidateUserPassword(Long id, String rawPassword) {
+        UserFullResponseDto user = userDao.findFullUserById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
+        if (user.getPassword() == null) {
+            return user;
+        }
         if (!encryptionService.decrypt(rawPassword, user.getPassword())) {
             throw new InvalidPasswordException();
         }
 
-        user.setPassword(rawPassword);
         return user;
     }
 
     @Transactional
-    public Long createUser(CreateUserDto userDto) {
-        Optional<User> existing = userDao.findOneByEmail(userDto.getEmail());
+    public Long createUser(UserCreateDto userDto) {
+        Optional<UserResponseDto> existing = userDao.findByEmail(userDto.getEmail());
         if (existing.isPresent()) {
             throw new EmailAlreadyExistsException(userDto.getEmail());
         }
 
         try {
-            return userDao.registerUser(userDto);
+            return userDao.register(userDto);
         } catch (DuplicateKeyException e) {
             throw new EmailAlreadyExistsException(userDto.getEmail());
         }
@@ -56,7 +59,7 @@ public class UserService {
 
     @Transactional
     public void deactivateUserById(long userId) {
-        boolean exists = userDao.findOneById(userId).isPresent();
+        boolean exists = userDao.findById(userId).isPresent();
         if (!exists) {
             throw new UserNotFoundException(userId);
         }

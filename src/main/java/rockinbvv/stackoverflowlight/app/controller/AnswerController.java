@@ -11,9 +11,9 @@
 //import org.springframework.web.bind.annotation.RequestBody;
 //import org.springframework.web.bind.annotation.RequestMapping;
 //import org.springframework.web.bind.annotation.RestController;
-//import rockinbvv.stackoverflowlight.app.data.dto.answer.request.AnswerCreateDto;
-//import rockinbvv.stackoverflowlight.app.data.dto.answer.response.FullAnswerResponseDto;
-//import rockinbvv.stackoverflowlight.app.data.Answer;
+//import rockinbvv.stackoverflowlight.app.data.answer.AnswerCreateDto;
+//import rockinbvv.stackoverflowlight.app.data.answer.FullAnswerResponseDto;
+//import rockinbvv.stackoverflowlight.app.data.answer.Answer;
 //import rockinbvv.stackoverflowlight.app.service.AnswerService;
 //
 //@RestController

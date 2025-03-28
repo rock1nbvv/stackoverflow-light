@@ -1,11 +1,11 @@
-package rockinbvv.stackoverflowlight.app.exception;
+package rockinbvv.stackoverflowlight.system;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import rockinbvv.stackoverflowlight.app.ResponseWrapper;
+import rockinbvv.stackoverflowlight.app.exception.ApplicationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

@@ -8,7 +8,7 @@ import liquibase.exception.SetupException;
 import liquibase.exception.ValidationErrors;
 import liquibase.resource.ResourceAccessor;
 import lombok.RequiredArgsConstructor;
-import rockinbvv.stackoverflowlight.system.crypto.EncryptionService;
+import rockinbvv.stackoverflowlight.system.security.EncryptionService;
 
 import java.sql.Statement;
 

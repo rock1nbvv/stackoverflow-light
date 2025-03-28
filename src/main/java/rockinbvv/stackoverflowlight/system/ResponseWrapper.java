@@ -1,4 +1,4 @@
-package rockinbvv.stackoverflowlight.app;
+package rockinbvv.stackoverflowlight.system;
 
 
 import lombok.AllArgsConstructor;
@@ -32,6 +32,7 @@ public class ResponseWrapper<T> {
 
     public static <T> ResponseWrapper<T> error(String errorMessage, T data) {
         return ResponseWrapper.<T>builder()
+                .success(false)
                 .errorMessage(errorMessage)
                 .data(data)
                 .build();

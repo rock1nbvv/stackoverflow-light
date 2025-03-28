@@ -6,8 +6,8 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import rockinbvv.stackoverflowlight.app.dao.UserDao;
-import rockinbvv.stackoverflowlight.app.data.User;
-import rockinbvv.stackoverflowlight.app.data.dto.user.request.CreateUserDto;
+import rockinbvv.stackoverflowlight.app.data.user.OidcUserResponseDto;
+import rockinbvv.stackoverflowlight.app.data.user.UserCreateDto;
 
 import java.util.Optional;
 import java.util.Set;
@@ -25,17 +25,17 @@ public class CustomOidcUserService extends OidcUserService {
 
         String email = oidcUser.getAttribute("email");
         String googleId = oidcUser.getAttribute("sub");
-        Optional<User> optionalUser = userDao.findOneByEmail(email);
-        Long userId = optionalUser.map(User::getId)
-                .orElse(
-                        userDao.registerUser(
-                                CreateUserDto.builder()
-                                        .email(email)
-                                        .googleId(googleId)
-                                        .name(oidcUser.getAttribute("name"))
-                                        .build()
+        Optional<OidcUserResponseDto> optionalUser = userDao.findOidcUserByEmail(email);
+
+        Long userId = optionalUser.map(OidcUserResponseDto::getId)
+                .orElseGet(() -> userDao.register(UserCreateDto.builder()
+                                .email(email)
+                                .googleId(googleId)
+                                .name(oidcUser.getAttribute("name"))
+                                .build()
                         )
                 );
+
         return new CustomOidcUser(
                 userId,
                 Set.copyOf(oidcUser.getAuthorities()),

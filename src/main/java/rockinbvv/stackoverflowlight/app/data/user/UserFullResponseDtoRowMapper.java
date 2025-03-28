@@ -1,14 +1,14 @@
-package rockinbvv.stackoverflowlight.app.data;
+package rockinbvv.stackoverflowlight.app.data.user;
 
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserRowMapper implements RowMapper<User> {
+public class UserFullResponseDtoRowMapper implements RowMapper<UserFullResponseDto> {
     @Override
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return User.builder()
+    public UserFullResponseDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return UserFullResponseDto.builder()
                 .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .password(rs.getString("password"))

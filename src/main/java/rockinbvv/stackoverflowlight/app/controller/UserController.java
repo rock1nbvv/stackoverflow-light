@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import rockinbvv.stackoverflowlight.app.ResponseWrapper;
-import rockinbvv.stackoverflowlight.app.data.User;
-import rockinbvv.stackoverflowlight.app.data.dto.user.request.CreateUserDto;
+import rockinbvv.stackoverflowlight.system.ResponseWrapper;
+import rockinbvv.stackoverflowlight.app.data.user.UserCreateDto;
+import rockinbvv.stackoverflowlight.app.data.user.UserFullResponseDto;
+import rockinbvv.stackoverflowlight.app.data.user.UserResponseDto;
 import rockinbvv.stackoverflowlight.app.service.UserService;
 
 @RestController
@@ -27,19 +28,19 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseWrapper<User> getUserById(@PathVariable Long id) {
+    public ResponseWrapper<UserResponseDto> getUserById(@PathVariable Long id) {
         return ResponseWrapper.ok(userService.getUserById(id));
     }
 
     @GetMapping("/{id}/full")
     @Description("Get user and validate its password")
-    public ResponseWrapper<User> getFullUserById(@PathVariable Long id, @RequestParam String password) {
-        User user = userService.getAndValidateUserPassword(id, password);
+    public ResponseWrapper<UserFullResponseDto> getFullUserById(@PathVariable Long id, @RequestParam String password) {
+        UserFullResponseDto user = userService.getAndValidateUserPassword(id, password);
         return ResponseWrapper.ok(user);
     }
 
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseWrapper<Long> createUser(@RequestBody CreateUserDto dto) {
+    public ResponseWrapper<Long> createUser(@RequestBody UserCreateDto dto) {
         return ResponseWrapper.ok(userService.createUser(dto));
     }
 

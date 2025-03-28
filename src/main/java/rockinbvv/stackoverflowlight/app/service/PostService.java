@@ -4,11 +4,11 @@
 //import jakarta.transaction.Transactional;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.stereotype.Service;
-//import rockinbvv.stackoverflowlight.app.data.dto.answer.response.AnswerResponseDto;
-//import rockinbvv.stackoverflowlight.app.data.dto.post.request.PostCreateDto;
-//import rockinbvv.stackoverflowlight.app.data.Answer;
-//import rockinbvv.stackoverflowlight.app.data.Post;
-//import rockinbvv.stackoverflowlight.app.data.User;
+//import rockinbvv.stackoverflowlight.app.data.answer.AnswerResponseDto;
+//import rockinbvv.stackoverflowlight.app.data.post.PostCreateDto;
+//import rockinbvv.stackoverflowlight.app.data.answer.Answer;
+//import rockinbvv.stackoverflowlight.app.data.post.Post;
+//import rockinbvv.stackoverflowlight.app.data.user.User;
 //import rockinbvv.stackoverflowlight.app.repository.AnswerRepository;
 //import rockinbvv.stackoverflowlight.app.repository.PostRepository;
 //import rockinbvv.stackoverflowlight.app.repository.UserRepository;

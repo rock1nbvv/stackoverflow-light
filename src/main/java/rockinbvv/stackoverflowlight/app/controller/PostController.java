@@ -17,9 +17,9 @@
 //import org.springframework.web.bind.annotation.RequestBody;
 //import org.springframework.web.bind.annotation.RequestMapping;
 //import org.springframework.web.bind.annotation.RestController;
-//import rockinbvv.stackoverflowlight.app.data.dto.post.request.PostCreateDto;
-//import rockinbvv.stackoverflowlight.app.data.Answer;
-//import rockinbvv.stackoverflowlight.app.data.Post;
+//import rockinbvv.stackoverflowlight.app.data.post.PostCreateDto;
+//import rockinbvv.stackoverflowlight.app.data.answer.Answer;
+//import rockinbvv.stackoverflowlight.app.data.post.Post;
 //import rockinbvv.stackoverflowlight.app.service.PostService;
 //import rockinbvv.stackoverflowlight.system.security.CustomOidcUser;
 //
