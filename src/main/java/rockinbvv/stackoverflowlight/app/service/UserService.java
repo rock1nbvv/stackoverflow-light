@@ -9,8 +9,9 @@ import rockinbvv.stackoverflowlight.app.data.user.UserCreateDto;
 import rockinbvv.stackoverflowlight.app.data.user.UserFullResponseDto;
 import rockinbvv.stackoverflowlight.app.data.user.UserResponseDto;
 import rockinbvv.stackoverflowlight.app.exception.EmailAlreadyExistsException;
+import rockinbvv.stackoverflowlight.app.exception.EntityNotFoundException;
+import rockinbvv.stackoverflowlight.app.exception.EntityType;
 import rockinbvv.stackoverflowlight.app.exception.InvalidPasswordException;
-import rockinbvv.stackoverflowlight.app.exception.UserNotFoundException;
 import rockinbvv.stackoverflowlight.system.security.EncryptionService;
 
 import java.util.Optional;
@@ -25,13 +26,13 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponseDto getUserById(long id) {
         return userDao.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "id", id));
     }
 
     @Transactional(readOnly = true)
     public UserFullResponseDto getAndValidateUserPassword(Long id, String rawPassword) {
         UserFullResponseDto user = userDao.findFullUserById(id)
-                .orElseThrow(() -> new UserNotFoundException(id));
+                .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "id", id));
 
         if (user.getPassword() == null) {
             return user;
@@ -58,12 +59,12 @@ public class UserService {
     }
 
     @Transactional
-    public void deactivateUserById(long userId) {
-        boolean exists = userDao.findById(userId).isPresent();
+    public void deactivateUserById(long id) {
+        boolean exists = userDao.findById(id).isPresent();
         if (!exists) {
-            throw new UserNotFoundException(userId);
+            throw new EntityNotFoundException(EntityType.USER, "id", id);
         }
 
-        userDao.corruptById(userId);
+        userDao.corruptById(id);
     }
 }

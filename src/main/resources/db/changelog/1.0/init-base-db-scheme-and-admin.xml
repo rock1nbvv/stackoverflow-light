@@ -5,8 +5,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-
-    <changeSet id="001-init-user-schema-and-admin" author="vlad.baklaiev">
+    <changeSet id="001-init-app-user-schema-and-admin" author="vlad.baklaiev">
         <createTable tableName="app_user">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
@@ -26,10 +25,9 @@
 
         <customChange class="rockinbvv.stackoverflowlight.system.db.CreateAdminChange"/>
     </changeSet>
-    <changeSet id="2025-03-28-01-init-post-answer-vote" author="vlad.baklaiev">
-        <!-- POST table -->
+    <changeSet id="002-init-post" author="vlad.baklaiev">
         <createTable tableName="post">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="title" type="text">
@@ -38,7 +36,7 @@
             <column name="body" type="text">
                 <constraints nullable="false"/>
             </column>
-            <column name="author_id" type="bigint">
+            <column name="id_author" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="creation_date" type="timestamptz" defaultValueComputed="NOW()"/>
@@ -47,7 +45,7 @@
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableName="post" baseColumnNames="author_id"
+                baseTableName="post" baseColumnNames="id_author"
                 referencedTableName="app_user" referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_post_author"/>
@@ -61,19 +59,20 @@
             <column name="downvote_count" descending="false"/>
         </createIndex>
 
-        <createIndex tableName="post" indexName="idx_post_author_id">
-            <column name="author_id"/>
+        <createIndex tableName="post" indexName="idx_post_id_author">
+            <column name="id_author"/>
         </createIndex>
 
-        <!-- ANSWER table -->
+    </changeSet>
+    <changeSet id="003-init-answer" author="vlad.baklaiev">
         <createTable tableName="answer">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="body" type="text">
                 <constraints nullable="false"/>
             </column>
-            <column name="author_id" type="bigint">
+            <column name="id_author" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="post_id" type="bigint">
@@ -86,7 +85,7 @@
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableName="answer" baseColumnNames="author_id"
+                baseTableName="answer" baseColumnNames="id_author"
                 referencedTableName="app_user" referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_answer_author"/>
@@ -115,10 +114,11 @@
             <column name="post_id"/>
             <column name="creation_date" descending="true"/>
         </createIndex>
-
+    </changeSet>
+    <changeSet id="004-init-vote" author="vlad.baklaiev">
         <!-- VOTE table -->
         <createTable tableName="vote">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="user_id" type="bigint">
@@ -156,11 +156,9 @@
         <createIndex tableName="vote" indexName="idx_vote_post_id">
             <column name="post_id"/>
         </createIndex>
-
         <createIndex tableName="vote" indexName="idx_vote_answer_id">
             <column name="answer_id"/>
         </createIndex>
-
         <!-- VOTE AGGREGATION LOG table -->
         <createTable tableName="vote_aggregation_log">
             <column name="id" type="bigserial">
@@ -174,7 +172,6 @@
             </column>
             <column name="created_at" type="timestamptz" defaultValueComputed="NOW()"/>
         </createTable>
-
         <addUniqueConstraint
                 tableName="vote_aggregation_log"
                 columnNames="entity_type,entity_id"

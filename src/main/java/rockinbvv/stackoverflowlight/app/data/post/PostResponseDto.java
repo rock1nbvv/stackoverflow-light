@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
+
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,5 +15,6 @@ public class PostResponseDto {
     private String title;
     private String body;
     @NotNull
-    private Long idAuthor;
+    private Long authorId;
+    private Instant creationDate;
 }
