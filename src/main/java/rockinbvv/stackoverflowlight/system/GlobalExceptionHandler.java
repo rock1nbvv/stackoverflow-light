@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ResponseWrapper<Void>> handleAppException(ApplicationException ex) {
-        log.warn("Handled business exception: [{}] {}", ex.getErrorCode(), ex.getMessage());
+        log.warn("Handled business exception: [{}] {}\n", ex.getErrorCode(), ex.getMessage(), ex);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Error-Code", ex.getErrorCode());
 

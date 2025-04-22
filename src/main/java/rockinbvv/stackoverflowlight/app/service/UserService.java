@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import rockinbvv.stackoverflowlight.app.dao.UserAuthDao;
 import rockinbvv.stackoverflowlight.app.dao.UserDao;
 import rockinbvv.stackoverflowlight.app.data.user.UserCreateDto;
 import rockinbvv.stackoverflowlight.app.data.user.UserFullResponseDto;
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserDao userDao;
+    private final UserAuthDao userAuthDao;
     private final EncryptionService encryptionService;
 
     @Transactional(readOnly = true)
@@ -31,17 +33,52 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserFullResponseDto getAndValidateUserPassword(Long id, String rawPassword) {
-        UserFullResponseDto user = userDao.findFullUserById(id)
+        // Find the user by ID
+        UserResponseDto user = userDao.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "id", id));
 
-        if (user.getPassword() == null) {
-            return user;
+        // Find password auth for this user
+        var passwordAuthOpt = userAuthDao.findPasswordAuthByUserId(id);
+
+        // If no password auth exists, return the user without validation
+        if (passwordAuthOpt.isEmpty()) {
+            return userDao.findFullUserById(id)
+                    .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "id", id));
         }
-        if (!encryptionService.decrypt(rawPassword, user.getPassword())) {
+
+        // Validate password
+        if (!encryptionService.decrypt(rawPassword, passwordAuthOpt.get().getPassword())) {
             throw new InvalidPasswordException();
         }
 
-        return user;
+        // Return full user data
+        return userDao.findFullUserById(id)
+                .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "id", id));
+    }
+
+    @Transactional(readOnly = true)
+    public UserFullResponseDto authenticateUserByEmailAndPassword(String email, String rawPassword) {
+        // Find the user by email
+        UserResponseDto user = userDao.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "email", email));
+
+        // Only admin users can login with password
+        if (user.getIsAdmin() == null || !user.getIsAdmin()) {
+            throw new InvalidPasswordException("Only admin users can login with password");
+        }
+
+        // Find password auth for this user
+        var passwordAuth = userAuthDao.findPasswordAuthByUserId(user.getId())
+                .orElseThrow(() -> new InvalidPasswordException("User does not have a password"));
+
+        // Validate password
+        if (!encryptionService.decrypt(rawPassword, passwordAuth.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+
+        // Return full user data
+        return userDao.findFullUserByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "email", email));
     }
 
     @Transactional
@@ -52,7 +89,18 @@ public class UserService {
         }
 
         try {
-            return userDao.register(userDto);
+            Long userId = userDao.register(userDto);
+
+            // Create auth records if credentials are provided
+            if (userDto.getPassword() != null) {
+                userAuthDao.createPasswordAuth(userId, userDto.getPassword());
+            }
+
+            if (userDto.getGoogleId() != null) {
+                userAuthDao.createGoogleAuth(userId, userDto.getGoogleId());
+            }
+
+            return userId;
         } catch (DuplicateKeyException e) {
             throw new EmailAlreadyExistsException(userDto.getEmail());
         }

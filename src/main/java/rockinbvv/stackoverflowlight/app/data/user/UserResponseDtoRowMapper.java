@@ -12,6 +12,7 @@ public class UserResponseDtoRowMapper implements RowMapper<UserResponseDto> {
                 .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .email(rs.getString("email"))
+                .isAdmin(rs.getBoolean("is_admin"))
                 .build();
     }
 }

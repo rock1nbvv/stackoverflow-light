@@ -16,17 +16,16 @@ import java.util.Optional;
 public class PostDao {
     private final JdbcClient jdbc;
 
-    public long create(CreatePostRequest dto) {
+    public long create(CreatePostRequest dto, Long authorId) {
         return jdbc
                 .sql("""
-                        INSERT INTO post (title, body, id_author, creation_date)
-                        VALUES (:title, :body, :authorId, :now)
+                        INSERT INTO post (title, body, id_author)
+                        VALUES (:title, :body, :authorId)
                         RETURNING id
                         """)
                 .param("title", dto.getTitle())
                 .param("body", dto.getBody())
-                .param("authorId", dto.getAuthorId())
-                .param("now", Instant.now())
+                .param("authorId", authorId)
                 .query(Long.class)
                 .single();
     }
@@ -61,4 +60,18 @@ public class PostDao {
                 .query(Long.class)
                 .single();
     }
+
+    public void updateVoteStats(long postId, int upvotes, int downvotes) {
+        jdbc.sql("""
+                            UPDATE post
+                            SET upvote_count = :upvotes,
+                                downvote_count = :downvotes
+                            WHERE id = :postId
+                        """)
+                .param("upvotes", upvotes)
+                .param("downvotes", downvotes)
+                .param("postId", postId)
+                .update();
+    }
+
 }

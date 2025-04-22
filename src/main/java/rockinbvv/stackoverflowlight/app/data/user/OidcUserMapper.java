@@ -13,6 +13,7 @@ public class OidcUserMapper implements RowMapper<OidcUserResponseDto> {
                 .name(rs.getString("name"))
                 .googleId(rs.getString("google_id"))
                 .email(rs.getString("email"))
+                .isAdmin(rs.getBoolean("is_admin"))
                 .build();
     }
 }

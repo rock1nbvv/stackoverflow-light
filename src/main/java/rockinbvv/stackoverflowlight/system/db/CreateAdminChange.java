@@ -24,11 +24,26 @@ public class CreateAdminChange implements CustomTaskChange {
 
             try {
                 Statement updateStatement = dbConn.createStatement();
-                updateStatement.execute(String.format("insert into app_user(name, email, password) values ('%s', '%s', '%s')",
+
+                // Insert admin user
+                updateStatement.execute(String.format("insert into app_user(name, email, is_admin) values ('%s', '%s', %b)",
                         "VladTheGreat",
                         "vlad.dracula@impaler.com",
+                        true
+                ));
+
+                // Get the admin user ID
+                var resultSet = updateStatement.executeQuery("select id from app_user where email = 'vlad.dracula@impaler.com'");
+                resultSet.next();
+                long adminId = resultSet.getLong("id");
+
+                // Insert admin password auth
+                updateStatement.execute(String.format("insert into user_auth(id_user, auth_type, password) values (%d, '%s', '%s')",
+                        adminId,
+                        "PASSWORD",
                         encryptionService.encrypt("impaler228")
                 ));
+
                 updateStatement.close();
             } catch (Exception e) {
                 throw new CustomChangeException(e);

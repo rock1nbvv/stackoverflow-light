@@ -14,4 +14,5 @@ public class UserFullResponseDto {
     private String password;
     private String googleId;
     private String email;
+    private Boolean isAdmin;
 }

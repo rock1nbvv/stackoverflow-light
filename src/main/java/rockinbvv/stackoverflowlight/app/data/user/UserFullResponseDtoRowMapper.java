@@ -11,9 +11,10 @@ public class UserFullResponseDtoRowMapper implements RowMapper<UserFullResponseD
         return UserFullResponseDto.builder()
                 .id(rs.getLong("id"))
                 .name(rs.getString("name"))
+                .email(rs.getString("email"))
+                .isAdmin(rs.getBoolean("is_admin"))
                 .password(rs.getString("password"))
                 .googleId(rs.getString("google_id"))
-                .email(rs.getString("email"))
                 .build();
     }
 }

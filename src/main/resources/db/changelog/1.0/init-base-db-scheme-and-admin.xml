@@ -21,6 +21,9 @@
             <column name="email" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
+            <column name="is_admin" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <customChange class="rockinbvv.stackoverflowlight.system.db.CreateAdminChange"/>
@@ -75,10 +78,10 @@
             <column name="id_author" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="post_id" type="bigint">
+            <column name="id_post" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_id" type="bigint"/>
+            <column name="id_parent" type="bigint"/>
             <column name="creation_date" type="timestamptz" defaultValueComputed="NOW()"/>
             <column name="upvote_count" type="bigint" defaultValueNumeric="0"/>
             <column name="downvote_count" type="bigint" defaultValueNumeric="0"/>
@@ -91,27 +94,27 @@
                 constraintName="fk_answer_author"/>
 
         <addForeignKeyConstraint
-                baseTableName="answer" baseColumnNames="post_id"
+                baseTableName="answer" baseColumnNames="id_post"
                 referencedTableName="post" referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_answer_post"/>
 
         <addForeignKeyConstraint
-                baseTableName="answer" baseColumnNames="parent_id"
+                baseTableName="answer" baseColumnNames="id_parent"
                 referencedTableName="answer" referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_answer_parent"/>
 
-        <createIndex tableName="answer" indexName="idx_answer_post_id">
-            <column name="post_id"/>
+        <createIndex tableName="answer" indexName="idx_answer_id_post">
+            <column name="id_post"/>
         </createIndex>
 
-        <createIndex tableName="answer" indexName="idx_answer_parent_id">
-            <column name="parent_id"/>
+        <createIndex tableName="answer" indexName="idx_answer_id_parent">
+            <column name="id_parent"/>
         </createIndex>
 
         <createIndex tableName="answer" indexName="idx_answer_creation_date_desc">
-            <column name="post_id"/>
+            <column name="id_post"/>
             <column name="creation_date" descending="true"/>
         </createIndex>
     </changeSet>
@@ -121,11 +124,11 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="user_id" type="bigint">
+            <column name="id_user" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="post_id" type="bigint"/>
-            <column name="answer_id" type="bigint"/>
+            <column name="id_post" type="bigint"/>
+            <column name="id_answer" type="bigint"/>
             <column name="upvote" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
@@ -133,32 +136,42 @@
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableName="vote" baseColumnNames="user_id"
+                baseTableName="vote" baseColumnNames="id_user"
                 referencedTableName="app_user" referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_vote_user"/>
 
         <addForeignKeyConstraint
-                baseTableName="vote" baseColumnNames="post_id"
+                baseTableName="vote" baseColumnNames="id_post"
                 referencedTableName="post" referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_vote_post"/>
 
         <addForeignKeyConstraint
-                baseTableName="vote" baseColumnNames="answer_id"
+                baseTableName="vote" baseColumnNames="id_answer"
                 referencedTableName="answer" referencedColumnNames="id"
                 onDelete="CASCADE"
                 constraintName="fk_vote_answer"/>
 
-        <addUniqueConstraint tableName="vote" columnNames="user_id,post_id" constraintName="uc_vote_user_post"/>
-        <addUniqueConstraint tableName="vote" columnNames="user_id,answer_id" constraintName="uc_vote_user_answer"/>
+        <addUniqueConstraint
+                tableName="vote"
+                columnNames="id_user, id_post, id_answer"
+                constraintName="uc_vote_user_target"/>
 
-        <createIndex tableName="vote" indexName="idx_vote_post_id">
-            <column name="post_id"/>
+        <createIndex tableName="vote" indexName="idx_vote_id_post">
+            <column name="id_post"/>
         </createIndex>
-        <createIndex tableName="vote" indexName="idx_vote_answer_id">
-            <column name="answer_id"/>
+        <createIndex tableName="vote" indexName="idx_vote_id_answer">
+            <column name="id_answer"/>
         </createIndex>
+        <sql>
+            ALTER TABLE vote
+                ADD CONSTRAINT chk_vote_target
+                    CHECK (
+                        (id_post IS NOT NULL AND id_answer IS NULL) OR
+                        (id_post IS NULL AND id_answer IS NOT NULL)
+                        );
+        </sql>
         <!-- VOTE AGGREGATION LOG table -->
         <createTable tableName="vote_aggregation_log">
             <column name="id" type="bigserial">
@@ -167,14 +180,14 @@
             <column name="entity_type" type="text">
                 <constraints nullable="false"/>
             </column>
-            <column name="entity_id" type="bigint">
+            <column name="id_entity" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="created_at" type="timestamptz" defaultValueComputed="NOW()"/>
         </createTable>
         <addUniqueConstraint
                 tableName="vote_aggregation_log"
-                columnNames="entity_type,entity_id"
+                columnNames="entity_type,id_entity"
                 constraintName="uc_vote_aggregation_log_unique"/>
     </changeSet>
 </databaseChangeLog>

@@ -1,65 +1,54 @@
-//package rockinbvv.stackoverflowlight.app.service;
-//
-//import jakarta.persistence.EntityNotFoundException;
-//import jakarta.transaction.Transactional;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//import rockinbvv.stackoverflowlight.app.data.answer.AnswerCreateDto;
-//import rockinbvv.stackoverflowlight.app.data.answer.FullAnswerResponseDto;
-//import rockinbvv.stackoverflowlight.app.data.answer.Answer;
-//import rockinbvv.stackoverflowlight.app.data.post.Post;
-//import rockinbvv.stackoverflowlight.app.data.user.User;
-//import rockinbvv.stackoverflowlight.app.repository.AnswerRepository;
-//import rockinbvv.stackoverflowlight.app.repository.PostRepository;
-//import rockinbvv.stackoverflowlight.app.repository.UserRepository;
-//
-//import java.util.Optional;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class AnswerService {
-//    private final AnswerRepository answerRepository;
-//    private final UserRepository userRepository;
-//    private final PostRepository postRepository;
-//
-//    @Transactional
-//    public Answer getVladById() {
-//        Optional<Answer> test = answerRepository.someCustomMethod(Answer.builder().build());
-//
-//        return test.orElse(null);
-//    }
-//
-//    @Transactional
-//    public FullAnswerResponseDto getAnswerById(Long id) {
-//        FullAnswerResponseDto answer = answerRepository.findAnswerById(id).orElse(null);
-//
-//        return answer;
-//    }
-//
-//    @Transactional
-//    public Answer saveAnswer(AnswerCreateDto answerCreateDto) {
-//        User user = userRepository.findById(answerCreateDto.getIdAuthor())
-//                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-//        Post post = postRepository.findById(answerCreateDto.getIdPost())
-//                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
-//
-//        Answer.AnswerBuilder answerBuilder = Answer.builder()
-//                .author(user)
-//                .post(post)
-//                .body(answerCreateDto.getBody());
-//
-//        if (answerCreateDto.getIdParent() != null) {
-//            Answer parent = answerRepository.findById(answerCreateDto.getIdParent())
-//                    .orElseThrow(() -> new EntityNotFoundException("Parent Answer not found"));
-//
-//            answerBuilder.parent(parent);
-//        }
-//
-//        return answerRepository.save(answerBuilder.build());
-//    }
-//
-//    public void deleteAnswer(Long id) {
-//        answerRepository.deleteById(id);
-//    }
-//
-//}
+package rockinbvv.stackoverflowlight.app.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import rockinbvv.stackoverflowlight.app.dao.AnswerDao;
+import rockinbvv.stackoverflowlight.app.dao.PostDao;
+import rockinbvv.stackoverflowlight.app.dao.VoteDao;
+import rockinbvv.stackoverflowlight.app.data.answer.AnswerCreateDto;
+import rockinbvv.stackoverflowlight.app.data.answer.AnswerResponseDto;
+import rockinbvv.stackoverflowlight.app.data.vote.VoteStats;
+import rockinbvv.stackoverflowlight.app.exception.EntityNotFoundException;
+import rockinbvv.stackoverflowlight.app.exception.EntityType;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class AnswerService {
+
+    private final AnswerDao answerDao;
+    private final PostDao postDao;
+    private final VoteDao voteDao;
+
+    @Transactional
+    public long create(AnswerCreateDto dto, long authorId) {
+        if (postDao.findById(dto.getPostId()).isEmpty()) {
+            throw new EntityNotFoundException(EntityType.ANSWER, "id", dto.getPostId());
+        }
+
+        if (dto.getParentId() != null) {
+            AnswerResponseDto parentAnswer = answerDao.findById(dto.getParentId())
+                    .orElseThrow(() -> new EntityNotFoundException(EntityType.ANSWER, "id", dto.getParentId()));
+
+            if (!parentAnswer.getPostId().equals(dto.getPostId())) {
+                throw new IllegalArgumentException("Parent answer must belong to the same post");
+            }
+        }
+        return answerDao.create(dto, authorId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AnswerResponseDto> getAnswersForPost(long postId) {
+        return answerDao.findByPostId(postId);
+    }
+
+    @Transactional(readOnly = true)
+    public VoteStats getVoteStats(long answerId) {
+        if (answerDao.findById(answerId).isEmpty()) {
+            throw new EntityNotFoundException(EntityType.ANSWER, "id", answerId);
+        }
+        return voteDao.computeStatsForAnswer(answerId);
+    }
+}

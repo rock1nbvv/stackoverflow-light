@@ -6,6 +6,10 @@ public class InvalidPasswordException extends ApplicationException {
         super("Invalid password");
     }
 
+    public InvalidPasswordException(String message) {
+        super(message);
+    }
+
     @Override
     public String getErrorCode() {
         return "INVALID_PASSWORD";

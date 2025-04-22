@@ -1,13 +1,14 @@
 package rockinbvv.stackoverflowlight.app.data.answer;
 
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class AnswerCreateDto {
+    @NotBlank
     private String body;
-    private Long idAuthor;
-    private Long idPost;
-    private Long idParent;
+    @NotNull
+    private Long postId;
+    private Long parentId;
 }

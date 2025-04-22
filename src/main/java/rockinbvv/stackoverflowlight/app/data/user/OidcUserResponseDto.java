@@ -12,4 +12,5 @@ public class OidcUserResponseDto {
     private String name;
     private String googleId;
     private String email;
+    private Boolean isAdmin;
 }

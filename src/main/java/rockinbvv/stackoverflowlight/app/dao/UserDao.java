@@ -21,14 +21,13 @@ public class UserDao {
 
     public Long register(UserCreateDto userCreateDto) {
         return jdbcClient.sql("""
-                            INSERT INTO app_user (name, email, password, google_id)
-                            VALUES (:name, :email, :password, :googleId)
+                            INSERT INTO app_user (name, email, is_admin)
+                            VALUES (:name, :email, :isAdmin)
                             RETURNING id
                         """)
                 .param("name", userCreateDto.getName())
                 .param("email", userCreateDto.getEmail())
-                .param("password", userCreateDto.getPassword())
-                .param("googleId", userCreateDto.getGoogleId())
+                .param("isAdmin", userCreateDto.getIsAdmin() != null ? userCreateDto.getIsAdmin() : false)
                 .query(Long.class)
                 .single();
     }
@@ -53,23 +52,45 @@ public class UserDao {
                         u.id,
                         u.name,
                         u.email,
-                        u.google_id
+                        ua.google_id,
+                        u.is_admin
                         FROM app_user u
-                        WHERE email = :email
+                        LEFT JOIN user_auth ua ON u.id = ua.id_user AND ua.auth_type = 'GOOGLE'
+                        WHERE u.email = :email
                         """)
                 .param("email", email)
                 .query(new OidcUserMapper())
                 .optional();
     }
 
+    public Optional<UserFullResponseDto> findFullUserByEmail(String email) {
+        return jdbcClient.sql("""
+                        SELECT
+                        u.id,
+                        u.name,
+                        u.email,
+                        u.is_admin,
+                        ua_pass.password,
+                        ua_google.google_id
+                        FROM app_user u
+                        LEFT JOIN user_auth ua_pass ON u.id = ua_pass.id_user AND ua_pass.auth_type = 'PASSWORD'
+                        LEFT JOIN user_auth ua_google ON u.id = ua_google.id_user AND ua_google.auth_type = 'GOOGLE'
+                        WHERE u.email = :email
+                        """)
+                .param("email", email)
+                .query(new UserFullResponseDtoRowMapper())
+                .optional();
+    }
+
     public Optional<UserResponseDto> findById(Long id) {
         return jdbcClient.sql("""
                         SELECT
-                        u,id,
+                        u.id,
                         u.name,
-                        u.email
+                        u.email,
+                        u.is_admin
                         FROM app_user u
-                        WHERE id = :id
+                        WHERE u.id = :id
                         """)
                 .param("id", id)
                 .query(new UserResponseDtoRowMapper())
@@ -79,13 +100,16 @@ public class UserDao {
     public Optional<UserFullResponseDto> findFullUserById(Long id) {
         return jdbcClient.sql("""
                         SELECT
-                        u,id,
+                        u.id,
                         u.name,
-                        u.password,
-                        u.google_id,
-                        u.email
+                        u.email,
+                        u.is_admin,
+                        ua_pass.password,
+                        ua_google.google_id
                         FROM app_user u
-                        WHERE id = :id
+                        LEFT JOIN user_auth ua_pass ON u.id = ua_pass.id_user AND ua_pass.auth_type = 'PASSWORD'
+                        LEFT JOIN user_auth ua_google ON u.id = ua_google.id_user AND ua_google.auth_type = 'GOOGLE'
+                        WHERE u.id = :id
                         """)
                 .param("id", id)
                 .query(new UserFullResponseDtoRowMapper())
@@ -93,12 +117,19 @@ public class UserDao {
     }
 
     public void corruptById(Long userId) {
+        // Delete all auth records for this user
+        jdbcClient.sql("""
+                        DELETE FROM user_auth
+                        WHERE id_user = :id
+                        """)
+                .param("id", userId)
+                .update();
+
+        // Update user record
         jdbcClient.sql("""
                         UPDATE app_user
                         SET name = 'wiped',
-                            email = 'wiped',
-                            password = NULL,
-                            google_id = NULL
+                            email = 'wiped'
                         WHERE id = :id
                         """)
                 .param("id", userId)
