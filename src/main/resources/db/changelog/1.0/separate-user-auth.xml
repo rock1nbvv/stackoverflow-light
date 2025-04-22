@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="005-create-user-auth-table" author="vlad.baklaiev">
+        <!-- Create user_auth table -->
+        <createTable tableName="user_auth">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_user" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_user_auth_user" references="app_user(id)" deleteCascade="true"/>
+            </column>
+            <column name="auth_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+            </column>
+            <column name="google_id" type="varchar(255)">
+                <constraints unique="true"/>
+            </column>
+            <column name="created_at" type="timestamptz" defaultValueComputed="NOW()"/>
+            <column name="updated_at" type="timestamptz" defaultValueComputed="NOW()"/>
+        </createTable>
+
+        <!-- Create index on id_user -->
+        <createIndex tableName="user_auth" indexName="idx_user_auth_id_user">
+            <column name="id_user"/>
+        </createIndex>
+
+        <!-- Create unique constraint for user_id and auth_type -->
+        <addUniqueConstraint 
+            tableName="user_auth" 
+            columnNames="id_user, auth_type" 
+            constraintName="uc_user_auth_user_type"/>
+
+        <!-- Migrate existing data from app_user to user_auth -->
+        <sql>
+            -- Migrate password auth
+            INSERT INTO user_auth (id_user, auth_type, password)
+            SELECT id, 'PASSWORD', password
+            FROM app_user
+            WHERE password IS NOT NULL;
+
+            -- Migrate Google auth
+            INSERT INTO user_auth (id_user, auth_type, google_id)
+            SELECT id, 'GOOGLE', google_id
+            FROM app_user
+            WHERE google_id IS NOT NULL;
+        </sql>
+
+        <!-- Remove authentication columns from app_user -->
+        <dropColumn tableName="app_user" columnName="password"/>
+        <dropColumn tableName="app_user" columnName="google_id"/>
+    </changeSet>
+</databaseChangeLog>
