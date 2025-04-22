@@ -8,7 +8,7 @@ import liquibase.exception.SetupException;
 import liquibase.exception.ValidationErrors;
 import liquibase.resource.ResourceAccessor;
 import lombok.RequiredArgsConstructor;
-import rockinbvv.stackoverflowlight.system.security.EncryptionService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Statement;
 
@@ -17,7 +17,7 @@ public class CreateAdminChange implements CustomTaskChange {
 
     @Override
     public void execute(Database database) {
-        EncryptionService encryptionService = new EncryptionService();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(8);
 
         try {
             JdbcConnection dbConn = (JdbcConnection) database.getConnection();
@@ -41,7 +41,7 @@ public class CreateAdminChange implements CustomTaskChange {
                 updateStatement.execute(String.format("insert into user_auth(id_user, auth_type, password) values (%d, '%s', '%s')",
                         adminId,
                         "PASSWORD",
-                        encryptionService.encrypt("impaler228")
+                        passwordEncoder.encode("impaler228")
                 ));
 
                 updateStatement.close();

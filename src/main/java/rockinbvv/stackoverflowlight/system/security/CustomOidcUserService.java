@@ -7,7 +7,6 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
-import rockinbvv.stackoverflowlight.app.dao.UserAuthDao;
 import rockinbvv.stackoverflowlight.app.dao.UserDao;
 import rockinbvv.stackoverflowlight.app.data.user.OidcUserResponseDto;
 import rockinbvv.stackoverflowlight.app.data.user.UserCreateDto;

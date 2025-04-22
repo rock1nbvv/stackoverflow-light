@@ -35,11 +35,12 @@ public class UserDao {
     public Optional<UserResponseDto> findByEmail(String email) {
         return jdbcClient.sql("""
                         SELECT
-                        u,id,
+                        u.id,
                         u.name,
-                        u.email
+                        u.email,
+                        u.is_admin
                         FROM app_user u
-                        WHERE email = :email
+                        WHERE u.email = :email
                         """)
                 .param("email", email)
                 .query(new UserResponseDtoRowMapper())

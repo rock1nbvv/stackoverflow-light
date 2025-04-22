@@ -47,7 +47,7 @@ public class UserService {
         }
 
         // Validate password
-        if (!encryptionService.decrypt(rawPassword, passwordAuthOpt.get().getPassword())) {
+        if (!encryptionService.verifyPassword(rawPassword, passwordAuthOpt.get().getPassword())) {
             throw new InvalidPasswordException();
         }
 
@@ -72,7 +72,7 @@ public class UserService {
                 .orElseThrow(() -> new InvalidPasswordException("User does not have a password"));
 
         // Validate password
-        if (!encryptionService.decrypt(rawPassword, passwordAuth.getPassword())) {
+        if (!encryptionService.verifyPassword(rawPassword, passwordAuth.getPassword())) {
             throw new InvalidPasswordException();
         }
 
