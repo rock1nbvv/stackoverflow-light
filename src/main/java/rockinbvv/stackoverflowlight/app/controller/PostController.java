@@ -36,7 +36,6 @@ public class PostController {
     private final AnswerService answerService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyAuthority('OIDC_USER')")
     public ResponseWrapper<Long> create(@RequestBody CreatePostRequest createPostRequest) {
         Long userId = currentUserProvider.get().userId();
         return ResponseWrapper.ok(postService.create(createPostRequest, userId));

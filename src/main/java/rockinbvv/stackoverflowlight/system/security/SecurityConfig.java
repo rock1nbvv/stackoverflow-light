@@ -90,7 +90,14 @@ public class SecurityConfig {
                                 .successHandler(successHandler())
                 )
                 .sessionManagement(session ->
-                        session.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession)
+                        session
+                            .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::migrateSession)
+                            .maximumSessions(1)
+                            .maxSessionsPreventsLogin(false)
+                )
+                .rememberMe(rememberMe -> rememberMe
+                    .key("uniqueAndSecureKey")
+                    .tokenValiditySeconds(86400)
                 )
                 .securityContext(securityContext ->
                         securityContext.securityContextRepository(new DelegatingSecurityContextRepository(
