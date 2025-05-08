@@ -3,7 +3,6 @@ package rockinbvv.stackoverflowlight.app.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,17 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import rockinbvv.stackoverflowlight.app.data.answer.AnswerResponseDto;
 import rockinbvv.stackoverflowlight.app.data.post.CreatePostRequest;
 import rockinbvv.stackoverflowlight.app.data.post.PostResponseDto;
-import rockinbvv.stackoverflowlight.app.data.vote.VoteStats;
+import rockinbvv.stackoverflowlight.app.data.vote.RequestVoteDto;
 import rockinbvv.stackoverflowlight.app.service.AnswerService;
 import rockinbvv.stackoverflowlight.app.service.PostService;
 import rockinbvv.stackoverflowlight.system.PaginatedResponse;
 import rockinbvv.stackoverflowlight.system.ResponseWrapper;
 import rockinbvv.stackoverflowlight.system.security.CurrentUserProvider;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/post")
@@ -35,7 +31,7 @@ public class PostController {
     private final PostService postService;
     private final AnswerService answerService;
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = "application/json")
     public ResponseWrapper<Long> create(@RequestBody CreatePostRequest createPostRequest) {
         Long userId = currentUserProvider.get().userId();
         return ResponseWrapper.ok(postService.create(createPostRequest, userId));
@@ -53,13 +49,9 @@ public class PostController {
         return ResponseWrapper.ok(postService.getPaginatedPosts(page, size));
     }
 
-    @GetMapping("/{postId}/answers")
-    public ResponseWrapper<List<AnswerResponseDto>> getAnswersByPost(@PathVariable long postId) {
-        return ResponseWrapper.ok(answerService.getAnswersForPost(postId));
-    }
-
-    @GetMapping("/{postId}/votes")
-    public ResponseWrapper<VoteStats> getPostVoteStats(@PathVariable long postId) {
-        return ResponseWrapper.ok(postService.getVoteStats(postId));
+    @PostMapping("/{postId}/vote")
+    public void submitPostVote(@PathVariable long postId, @RequestBody RequestVoteDto requestVoteDto) {
+        Long userId = currentUserProvider.get().userId();
+        postService.submitVote(userId, postId, requestVoteDto);
     }
 }

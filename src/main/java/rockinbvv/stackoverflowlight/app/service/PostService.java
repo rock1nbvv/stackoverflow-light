@@ -5,10 +5,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rockinbvv.stackoverflowlight.app.dao.PostDao;
 import rockinbvv.stackoverflowlight.app.dao.UserDao;
-import rockinbvv.stackoverflowlight.app.dao.VoteDao;
 import rockinbvv.stackoverflowlight.app.data.post.CreatePostRequest;
 import rockinbvv.stackoverflowlight.app.data.post.PostResponseDto;
-import rockinbvv.stackoverflowlight.app.data.vote.VoteStats;
+import rockinbvv.stackoverflowlight.app.data.vote.RequestVoteDto;
 import rockinbvv.stackoverflowlight.app.exception.EntityNotFoundException;
 import rockinbvv.stackoverflowlight.app.exception.EntityType;
 import rockinbvv.stackoverflowlight.app.exception.NoEntitiesFoundException;
@@ -20,7 +19,6 @@ public class PostService {
 
     private final PostDao postDao;
     private final UserDao userDao;
-    private final VoteDao voteDao;
 
     public PostResponseDto getById(Long id) {
         return postDao.findById(id)
@@ -44,10 +42,10 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public VoteStats getVoteStats(long postId) {
+    public void submitVote(Long userId, Long postId, RequestVoteDto requestVoteDto) {
         if (postDao.findById(postId).isEmpty()) {
             throw new EntityNotFoundException(EntityType.POST, "id", postId);
         }
-        return voteDao.computeStatsForPost(postId);
+        postDao.submitVote(userId, postId, requestVoteDto);
     }
 }

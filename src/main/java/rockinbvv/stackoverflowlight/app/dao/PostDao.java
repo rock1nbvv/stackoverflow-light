@@ -6,8 +6,8 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 import rockinbvv.stackoverflowlight.app.data.post.CreatePostRequest;
 import rockinbvv.stackoverflowlight.app.data.post.PostResponseDto;
+import rockinbvv.stackoverflowlight.app.data.vote.RequestVoteDto;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +33,7 @@ public class PostDao {
     public Optional<PostResponseDto> findById(long id) {
         return jdbc
                 .sql("""
-                        SELECT id, title, body, id_author, creation_date, upvote_count, downvote_count
+                        SELECT id, title, body, id_author, creation_date
                         FROM post
                         WHERE id = :id
                         """)
@@ -45,7 +45,7 @@ public class PostDao {
     public List<PostResponseDto> findPaginated(int page, int size) {
         return jdbc
                 .sql("""
-                        SELECT id, title, body, id_author, creation_date, upvote_count, downvote_count
+                        SELECT id, title, body, id_author, creation_date
                         FROM post
                         ORDER BY creation_date DESC
                         OFFSET :offset LIMIT :limit
@@ -55,23 +55,21 @@ public class PostDao {
                 .query(PostResponseDto.class)
                 .list();
     }
+
     public long countAll() {
         return jdbc.sql("SELECT COUNT(*) FROM post")
                 .query(Long.class)
                 .single();
     }
 
-    public void updateVoteStats(long postId, int upvotes, int downvotes) {
+    public void submitVote(Long authorId, Long postId, RequestVoteDto dto) {
         jdbc.sql("""
-                            UPDATE post
-                            SET upvote_count = :upvotes,
-                                downvote_count = :downvotes
-                            WHERE id = :postId
+                        INSERT INTO post_vote (id_user, id_post, upvote)
+                        VALUES (:userId, :postId, :upvote)
                         """)
-                .param("upvotes", upvotes)
-                .param("downvotes", downvotes)
+                .param("userId", authorId)
                 .param("postId", postId)
+                .param("upvote", dto.getUpvote())
                 .update();
     }
-
 }

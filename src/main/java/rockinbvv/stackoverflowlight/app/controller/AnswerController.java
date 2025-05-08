@@ -4,14 +4,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import rockinbvv.stackoverflowlight.app.data.answer.AnswerCreateDto;
-import rockinbvv.stackoverflowlight.app.data.vote.VoteStats;
+import rockinbvv.stackoverflowlight.app.data.vote.RequestVoteDto;
 import rockinbvv.stackoverflowlight.app.service.AnswerService;
 import rockinbvv.stackoverflowlight.system.ResponseWrapper;
 import rockinbvv.stackoverflowlight.system.security.CurrentUserProvider;
@@ -31,8 +30,10 @@ public class AnswerController {
         long userId = currentUserProvider.get().userId();
         return ResponseWrapper.ok(answerService.create(dto, userId));
     }
-    @GetMapping("/{id}/votes")
-    public ResponseWrapper<VoteStats> getAnswerVoteStats(@PathVariable long id) {
-        return ResponseWrapper.ok(answerService.getVoteStats(id));
+
+    @PostMapping("/{answerId}/vote")
+    public void submitPostVote(@PathVariable long answerId, @RequestBody RequestVoteDto requestVoteDto) {
+        Long userId = currentUserProvider.get().userId();
+        answerService.submitVote(userId, answerId, requestVoteDto);
     }
 }

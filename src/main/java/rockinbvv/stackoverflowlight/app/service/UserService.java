@@ -33,50 +33,40 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserFullResponseDto getAndValidateUserPassword(Long id, String rawPassword) {
-        // Find the user by ID
         UserResponseDto user = userDao.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "id", id));
 
-        // Find password auth for this user
         var passwordAuthOpt = userAuthDao.findPasswordAuthByUserId(id);
 
-        // If no password auth exists, return the user without validation
         if (passwordAuthOpt.isEmpty()) {
             return userDao.findFullUserById(id)
                     .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "id", id));
         }
 
-        // Validate password
         if (!encryptionService.verifyPassword(rawPassword, passwordAuthOpt.get().getPassword())) {
             throw new InvalidPasswordException();
         }
 
-        // Return full user data
         return userDao.findFullUserById(id)
                 .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "id", id));
     }
 
     @Transactional(readOnly = true)
     public UserFullResponseDto authenticateUserByEmailAndPassword(String email, String rawPassword) {
-        // Find the user by email
         UserResponseDto user = userDao.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "email", email));
 
-        // Only admin users can login with password
         if (user.getIsAdmin() == null || !user.getIsAdmin()) {
             throw new InvalidPasswordException("Only admin users can login with password");
         }
 
-        // Find password auth for this user
         var passwordAuth = userAuthDao.findPasswordAuthByUserId(user.getId())
                 .orElseThrow(() -> new InvalidPasswordException("User does not have a password"));
 
-        // Validate password
         if (!encryptionService.verifyPassword(rawPassword, passwordAuth.getPassword())) {
             throw new InvalidPasswordException();
         }
 
-        // Return full user data
         return userDao.findFullUserByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException(EntityType.USER, "email", email));
     }
@@ -91,7 +81,6 @@ public class UserService {
         try {
             Long userId = userDao.register(userDto);
 
-            // Create auth records if credentials are provided
             if (userDto.getPassword() != null) {
                 userAuthDao.createPasswordAuth(userId, userDto.getPassword());
             }

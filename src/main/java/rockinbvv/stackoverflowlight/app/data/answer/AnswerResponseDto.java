@@ -1,7 +1,6 @@
 package rockinbvv.stackoverflowlight.app.data.answer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,9 +13,7 @@ public class AnswerResponseDto {
     private Long id;
     private String body;
     private Long authorId;
-    private Long postId;
-    private Long parentId;
+    private Long parentPostId;
+    private Long parentAnswerId;
     private Instant creationDate;
-    private int upvoteCount;
-    private int downvoteCount;
 }

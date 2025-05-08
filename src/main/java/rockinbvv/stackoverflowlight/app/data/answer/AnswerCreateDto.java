@@ -9,6 +9,6 @@ public class AnswerCreateDto {
     @NotBlank
     private String body;
     @NotNull
-    private Long postId;
-    private Long parentId;
+    private Long parentPostId;
+    private Long parentAnswerId;
 }

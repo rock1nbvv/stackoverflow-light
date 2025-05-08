@@ -118,7 +118,7 @@
         </createIndex>
     </changeSet>
     <changeSet id="004-init-post-votes" author="vlad.baklaiev">
-        <createTable tableName="post_votes">
+        <createTable tableName="post_vote">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -135,28 +135,28 @@
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableName="post_votes"
+                baseTableName="post_vote"
                 baseColumnNames="id_user"
-                constraintName="fk_post_votes_user"
+                constraintName="fk_post_vote_user"
                 referencedTableName="app_user"
                 referencedColumnNames="id"
                 onDelete="CASCADE"/>
 
         <addForeignKeyConstraint
-                baseTableName="post_votes"
+                baseTableName="post_vote"
                 baseColumnNames="id_post"
-                constraintName="fk_post_votes_post"
+                constraintName="fk_post_vote_post"
                 referencedTableName="post"
                 referencedColumnNames="id"
                 onDelete="CASCADE"/>
 
         <addUniqueConstraint
-                tableName="post_votes"
+                tableName="post_vote"
                 columnNames="id_user, id_post"
-                constraintName="uc_post_votes_unique_vote"/>
+                constraintName="uc_post_vote_unique_vote"/>
     </changeSet>
     <changeSet id="005-init-answer-votes" author="vlad.baklaiev">
-        <createTable tableName="answer_votes">
+        <createTable tableName="answer_vote">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -173,24 +173,24 @@
         </createTable>
 
         <addForeignKeyConstraint
-                baseTableName="answer_votes"
+                baseTableName="answer_vote"
                 baseColumnNames="id_user"
-                constraintName="fk_answer_votes_user"
+                constraintName="fk_answer_vote_user"
                 referencedTableName="app_user"
                 referencedColumnNames="id"
                 onDelete="CASCADE"/>
 
         <addForeignKeyConstraint
-                baseTableName="answer_votes"
+                baseTableName="answer_vote"
                 baseColumnNames="id_answer"
-                constraintName="fk_answer_votes_answer"
+                constraintName="fk_answer_vote_answer"
                 referencedTableName="answer"
                 referencedColumnNames="id"
                 onDelete="CASCADE"/>
 
         <addUniqueConstraint
-                tableName="answer_votes"
+                tableName="answer_vote"
                 columnNames="id_user, id_answer"
-                constraintName="uc_answer_votes_unique_vote"/>
+                constraintName="uc_answer_vote_unique_vote"/>
     </changeSet>
 </databaseChangeLog>

@@ -39,7 +39,6 @@ public class CustomOidcUserService extends OidcUserService {
             OidcUserResponseDto user = optionalUser.get();
             userId = user.getId();
 
-            // Add ROLE_ADMIN authority if the user is an admin
             if (user.getIsAdmin() != null && user.getIsAdmin()) {
                 authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
             }
